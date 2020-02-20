@@ -3,7 +3,7 @@ namespace App;
 
 class Text
 {
-    public $lengthTextPreview = 30;
+    public $lengthTextPreview = 300;
     private $stopWords=[];
     private $text;
 
@@ -12,7 +12,7 @@ class Text
      * @param $text string Изначальный текст до кадрирования
      * @return string
      */
-    public function preview($text):string
+    public function preview($text = ''):string
     {
         $this->text= $text;
 
@@ -20,7 +20,7 @@ class Text
             return 'Error !, sorry this text is does not valid!';
         }
 
-        if (!mb_strlen($this->text) > $this->lengthTextPreview) {
+        if (mb_strlen($this->text) <= $this->lengthTextPreview) {
             $this->checkStringOnStopWords();
             return $this->text;
         }
@@ -38,7 +38,7 @@ class Text
      * @param  $string string Слово которое необходимо сделать стоп-словом
      * @return boolean
      */
-    public function addStopWords($string):bool
+    public function addStopWord($string):bool
     {
         if (gettype($string) != 'string') {
             return false;
@@ -64,7 +64,7 @@ class Text
         }
         if ($this->getPositionWords()) {
             $this->text= trim(substr ( $this->text , 0, $this->getPositionWords()));
-            return true;
+            $this->checkStringOnStopWords();
         }
         return false;
     }
@@ -111,21 +111,17 @@ class Text
      */
     private function textValidate():bool
     {
-        try {
-            $text = $this->text;
-            //Удаляем экранирование символов
-            $text = stripslashes($text);
-            //Преобразуем html сущности в символы
-            $text = htmlspecialchars_decode($text, ENT_QUOTES);
-            //Удаляем переносы строк
-            $text = str_ireplace(array('<br>', '<br />', '<br/>'), ' ', $text);
-            //Удаляем теги из строки
-            $text = strip_tags($text);
-            $this->text = trim($text);
-            return true;
-        } catch (Exception $exception) {
-            return false;
-        }
+        $text = $this->text;
+        //Удаляем экранирование символов
+        $text = stripslashes($text);
+        //Преобразуем html сущности в символы
+        $text = htmlspecialchars_decode($text, ENT_QUOTES);
+        //Удаляем переносы строк
+        $text = str_ireplace(array('<br>', '<br />', '<br/>'), ' ', $text);
+        //Удаляем теги из строки
+        $text = strip_tags($text);
+        $this->text = trim($text);
+        return true;
     }
 
 }
